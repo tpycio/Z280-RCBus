@@ -34,7 +34,7 @@ When JP1 is closed, a serial bootstrap procedure takes place, following which th
 | Component type     | Reference | Description                                  | Quantity |
 | ------------------ | --------- | -------------------------------------------- | -------- |
 | PCB                |           | Z280 MPU Module PCB - Version 1.3            | 1        |
-| Integrated Circuit | U1        | Z80280xxVSC - Z280 MPU, CMOS, 68 pin PLCCC   | 1        |
+| Integrated Circuit | U1        | Z80280xxVSC - Z280 MPU, CMOS, 68 pin PLCC    | 1        |
 | Integrated Circuit | U2        | 74HCT574 - Octal D flip-flop, 20 pin DIP     | 1        |
 | Integrated Circuit | U3        | ATtiny4313 AVR microcontroller, 20 pin DIP   | 1        |
 | Crystal            | Q1        | 18.432 MHz, Crystal Oscillator, HC-49S       | 1        |
@@ -69,7 +69,7 @@ When JP1 is closed, a serial bootstrap procedure takes place, following which th
 | Component type     | Reference | Description                                  | Quantity |
 | ------------------ | --------- | -------------------------------------------- | -------- |
 | PCB                |           | Z280 512k Module PCB - Version 1.0           | 1        |
-| Integrated Circuit | U1        | Z80280xxVSC - Z280 MPU, CMOS, 68 pin PLCCC   | 1        |
+| Integrated Circuit | U1        | Z80280xxVSC - Z280 MPU, CMOS, 68 pin PLCC    | 1        |
 | Integrated Circuit | U2        | 74HCT574 - Octal D flip-flop, 20 pin DIP     | 1        |
 | Integrated Circuit | U3        | ATtiny4313 AVR microcontroller, 20 pin DIP   | 1        |
 | Integrated Circuit | U4        | SRAM 512kB 62512, 32 pin DIP                 | 1        |
