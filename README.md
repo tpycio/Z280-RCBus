@@ -5,5 +5,5 @@ Z280 MPU modules in RCBus standard with microcontroller for clock distribution, 
 - stand-alone, with its own 512kB memory, operating in bootstrap mode only;
 - universal, enabling traditional boot from ROM or via serial bootstrap.
 
-![populated board](\hardware\Z280MPU.jpg)
-![populated board](\hardware\Z280_512k.jpg)
+![populated board](hardware/Z280MPU.jpg)
+![populated board](hardware/Z280_512k.jpg)
