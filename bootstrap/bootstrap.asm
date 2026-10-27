@@ -1,6 +1,6 @@
 ;=====================================================================================
-;  Z280 Bootstrap Loader
-;  Copyright (c) 2023 by Tadeusz Pycio
+;  Z280 Bootstrap Loader 1.1
+;  Copyright (c) 2023,2026 by Tadeusz Pycio
 ;=====================================================================================
 
 ; Setings for IDE CF
@@ -43,24 +43,21 @@ RRREG         .equ  0E8h               ; Z280 REFRESH RATE REG
 
 ;=============================================================================
               .org  0
-              ld    sp, 0BFFFh          ; initialize stack pointer
+              ld    sp, 0C000h          ; initialize stack pointer
 ;-----------------------------------------------------------------------------
 ; Init CF
+              call  cf_ready           ; card ready after power-up
               ld    A,0E0h             ; set LBA mode
               out   (CF_LBA3),A
               ld    a, CF_8BIT         ; set feature to 8-bit interface
               out   (CF_FEATURES), a   ; store feature code
               ld    a, CF_SET_FEAT     ; get set features command
               out   (CF_COMMAND), a    ; perform set features
+              call  cf_ready
+
 cf_wait:      in    a,(CF_STATUS)      ; status register.
               and   80h                ; checking bit 7: BSY, "1" means the drive is busy.
               jp    nz, cf_wait
-;              call  cf_wait            ; Wait for compact flash to be ready
-;              ld    a, CF_NOCACHE      ; Set no write cache
-;              out   (CF_FEATURES), a   ; Store feature code
-;              ld    a, CF_SET_FEAT     ; Get set features command
-;              out   (CF_COMMAND), a    ; Perform set features
-;              call  cf_wait            ; Wait for compact flash to be ready
 ;-----------------------------------------------------------------------------
 ; Disk OS loader
 ;
@@ -68,7 +65,7 @@ NumSectors    .equ  24
 LoadAddr      .equ  0D000h
 
 
-bootcf:       ld    b,NumSectors       ;Number of physical sectors
+bootcf:       ld    e,NumSectors       ;Number of physical sectors
               ld    d,0                ;First sector number
               ld    hl,LoadAddr        ;Code from compact flash loads here
 ; Read sectors where one sector is 4 x 128 byte blocks = 512 bytes
@@ -83,17 +80,16 @@ readSec:      ld    a,d                ;Get sector number
               out   (CF_SECCOUNT),a    ;Store sector count
               ld    a,CF_READ_SEC      ;Get read sectors command
               out   (CF_COMMAND),a     ;Perform sector(s) read
-;              call  cf_wait            ;Wait for compact flash to be ready
-TestDRQ:      in    a,(CF_STATUS)      ;Read status register
-              and   8                  ; bit 3 is DRQ, wait for it to set
-              jr    z,TestDRQ          ;Low so not ready
+              call  cf_ready           ; A = status, BSY=0
+              bit   3,a                ; DRQ?
+              jr    z,readSec          ; error (ERR, no data) - retry sector
               ld    c,CF_DATA          ;Compact flash data register
-              ld    b, 0h              ; sector has 512 8-bit data
+              ld    b,0                ; sector has 512 8-bit data
               inir                     ;(HL)=(C), HL=HL+1, B=B-1, repeat
               inir
               inc   d                  ;Increment sector number
-              djnz  readSec            ;Repeat for all required sectors
-
+              dec   e
+              jr    nz,readSec         ;Repeat for all required sectors
 ;-----------------------------------------------------------------------------
               ld    c,CPU_IOPR         ; reg C points to I/O page register
               ld    l,0FFh             ; Page I/O is 0xFF
@@ -122,17 +118,21 @@ TestDRQ:      in    a,(CF_STATUS)      ;Read status register
               jp    (hl)               ;Run code downloaded from compact flash
 
 ;-----------------------------------------------------------------------------
-;cf_wait:      in    a,(CF_STATUS)      ; status register.
-;              and   80h                ; checking bit 7: BSY, "1" means the drive is busy.
-;              jp    nz, cf_wait
-;              ret
+; wait for BSY=0 and RDY=1, returns current status in A
+cf_ready:     in    a,(CF_STATUS)      ; first read discarded (400 ns rule)
+cf_rdy1:      in    a,(CF_STATUS)
+              and   0C0h
+              cp    040h
+              jr    nz,cf_rdy1
+              in    a,(CF_STATUS)
+              ret
 ;-----------------------------------------------------------------------------
 endload:     .equ  $
-         .IF  endload <= 00FFh
-              .fill  (00FFh - endload),0FFh        ; Pad bootstrap buffer to 256B in length.
+         .IF  endload <= 0100h
+              .fill  (0100h - endload),0FFh        ; Pad bootstrap buffer to 256B in length.
          .ELSE
               .echo  "*** Bootstap code is "
-              .echo  (endload - 00FFh)
+              .echo  (endload - 0100h)
               .echo  " byte(s) too long. MUST BE EXACTLY 256 bytes long ***\n"
          .ENDIF
               .end
