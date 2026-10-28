@@ -1,10 +1,12 @@
-# # Z280 serial bootstrap code
+# Z280 serial bootstrap code
 
 Example bootstrap code `BOOTSTRAP.ASM`, loading the CP/M 2.2 operating system from a CF disk with the structure used in SCM.
 
-
-
 # Loading RomWBW Using the Z280 Bootstrap in a ROM-less Environment
+
+<mark>PLEASE NOTE</mark>: From RomWBW version 3.7.0-dev.16 onwards, there is an `RCZ280_RCBUS_STD` profile which includes the fixes described. Simply build RomWBW and save the `RCZ280_rcbus_std_hd1k_combo.img` image to a CF card.
+
+
 
 Procedure for loading RomWBW using the Z280 bootstrap in a ROM-less environment with a CF card, IO=0x10.
 
